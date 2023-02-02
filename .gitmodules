@@ -1,0 +1,66 @@
+[submodule "examples/pygame-alien-dimension-wasm"]
+	path = examples/pygame-alien-dimension-wasm
+	url = https://github.com/pmp-p/pygame-alien-dimension-wasm
+[submodule "examples/pygame-pychess-wasm"]
+	path = examples/pygame-pychess-wasm
+	url = https://github.com/pmp-p/pygame-pychess-wasm
+[submodule "examples/pygame-galaxy-attack-wasm"]
+	path = examples/pygame-galaxy-attack-wasm
+	url = https://github.com/pmp-p/pygame-galaxy-attack-wasm
+[submodule "examples/pygame-breakout-wasm"]
+	path = examples/pygame-breakout-wasm
+	url = https://github.com/pmp-p/pygame-breakout-wasm
+[submodule "examples/pgzero-wasm"]
+	path = examples/pgzero-wasm
+	url = https://github.com/pmp-p/pgzero-wasm
+[submodule "examples/pygame-Sudoku-Solver-wasm"]
+	path = examples/pygame-Sudoku-Solver-wasm
+	url = https://github.com/pmp-p/pygame-Sudoku-Solver-wasm
+[submodule "examples/pygame-arachnoids-wasm"]
+	path = examples/pygame-arachnoids-wasm
+	url = https://github.com/pmp-p/pygame-arachnoids-wasm
+[submodule "examples/pygame-ttt-3d-wasm"]
+	path = examples/pygame-ttt-3d-wasm
+	url = https://github.com/pmp-p/pygame-ttt-3d-wasm
+[submodule "examples/pygame-escape_the_lab-wasm"]
+	path = examples/pygame-escape_the_lab-wasm
+	url = https://github.com/pmp-p/pygame-escape_the_lab-wasm
+[submodule "examples/pygame-JohnsAdventure-wasm"]
+	path = examples/pygame-JohnsAdventure-wasm
+	url = https://github.com/pmp-p/pygame-JohnsAdventure-wasm
+[submodule "examples/pygame-checkers-ai-wasm"]
+	path = examples/pygame-checkers-ai-wasm
+	url = https://github.com/pmp-p/pygame-checkers-ai-wasm
+[submodule "examples/pygame-fight_and_flight_wowie4-wasm"]
+	path = examples/pygame-fight_and_flight_wowie4-wasm
+	url = https://github.com/pmp-p/pygame-fight_and_flight_wowie4-wasm
+[submodule "examples/pygame-yarc-wasm"]
+	path = examples/pygame-yarc-wasm
+	url = https://github.com/pmp-p/pygame-yarc-wasm
+[submodule "examples/pygame-dimensionbeats-wasm"]
+	path = examples/pygame-dimensionbeats-wasm
+	url = https://github.com/pmp-p/pygame-dimensionbeats-wasm
+[submodule "examples/pygame-flappysammy-wasm"]
+	path = examples/pygame-flappysammy-wasm
+	url = https://github.com/pmp-p/pygame-flappysammy-wasm
+[submodule "examples/pygame-perfect-rain-wasm"]
+	path = examples/pygame-perfect-rain-wasm
+	url = https://github.com/pmp-p/pygame-perfect-rain-wasm
+[submodule "examples/pygame-dimensions-wasm"]
+	path = examples/pygame-dimensions-wasm
+	url = https://github.com/pmp-p/pygame-dimensions-wasm
+[submodule "examples/pygame-osc-wasm"]
+	path = examples/pygame-osc-wasm
+	url = https://github.com/pmp-p/pygame-osc-wasm
+[submodule "examples/pygame-gui-wasm"]
+	path = examples/pygame-gui-wasm
+	url = https://github.com/pmp-p/pygame-gui-wasm
+[submodule "examples/pygame-PenguinsCantFly-wasm"]
+	path = examples/pygame-PenguinsCantFly-wasm
+	url = https://github.com/pmp-p/pygame-PenguinsCantFly-wasm
+[submodule "examples/pygame-texteditor-wasm"]
+	path = examples/pygame-texteditor-wasm
+	url = https://github.com/pmp-p/pygame-texteditor-wasm
+[submodule "examples/pygame-lvgl-wasm"]
+	path = examples/pygame-lvgl-wasm
+	url = https://github.com/pmp-p/pygame-lvgl-wasm

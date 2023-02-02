@@ -1,0 +1,6 @@
+/logs
+/www
+/src/build
+.*.log
+/download-example
+web-cache
