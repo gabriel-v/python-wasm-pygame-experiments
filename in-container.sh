@@ -64,11 +64,11 @@ build src
 make_index
 
 code_watch () {
-  while /usr/bin/inotifywait --recursive --exclude 'build/web' --exclude 'build/web-cache' -e modify ./src || sleep 1; do
+  while /usr/bin/inotifywait --recursive --exclude 'build/web' --exclude 'build/web-cache' -e modify ./src || sleep .1; do
       echo "output reloading ..."
       build src
       make_index
-      sleep 1
+      sleep .01
   done
 }
 
