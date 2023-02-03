@@ -14,18 +14,24 @@ make_index() {
     echo '</body>' >> /mount/www/data/index.html
 }
 
+copy_assets() {
+  echo "copying assets to $1 ..."
+  # cp /usr/local/lib/python3.11/pdb.py $1/pdb.py
+}
+
 build() {
   (
 
     for full_path in $(find /mount/$1/ -type d -maxdepth 1 -mindepth 1); do
 	dirname=$(basename "$full_path")
-	echo "building $dirname..."
+	echo "building $dirname ..."
+	copy_assets "$full_path"
 	(
 	  (
 	    pygbag \
 		--template noctx.tmpl \
 		--app_name src \
-		--ume_block 1 \
+		--ume_block 0 \
 		--can_close 1 \
 		--package src \
 		--title src \
@@ -58,10 +64,11 @@ build src
 make_index
 
 code_watch () {
-  while /usr/bin/inotifywait --exclude '/mount/src/build/web' -e modify ./src; do
+  while /usr/bin/inotifywait --recursive --exclude 'build/web' --exclude 'build/web-cache' -e modify ./src || sleep 1; do
       echo "output reloading ..."
       build src
       make_index
+      sleep 1
   done
 }
 
