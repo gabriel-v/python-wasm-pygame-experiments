@@ -1,60 +1,108 @@
 #!/bin/bash -ex
 
-rm -rf /mount/www/data
-mkdir -p /mount/www/data
+export PATH_EXPORT=/mount/www/data
+export PATH_TEMP_BUILD=/mount/build
+
+rm -rf $PATH_EXPORT
+mkdir -p $PATH_EXPORT
 
 make_index() {
-    echo '<body>' > /mount/www/data/index.html
-    for full_path in $(find /mount/www/data/ -type d -maxdepth 1 -mindepth 1 | sort); do
-	dirname=$(basename "$full_path")
+  (
+  set +x
+  echo "making index..."
 
-	echo "<a href=\"/${dirname}\">/$dirname</a>" >> /mount/www/data/index.html
-	echo '<br/>' >> /mount/www/data/index.html
+    echo '<body>' > $PATH_EXPORT/index.html
+    for full_path in $(find $PATH_EXPORT/ -type d -maxdepth 1 -mindepth 1  | sort); do
+    dirname=$(basename "$full_path")
+
+    echo "<a href=\"/${dirname}\">/$dirname</a>" >> $PATH_EXPORT/index.html
+    echo '<br/>' >> $PATH_EXPORT/index.html
     done
-    echo '</body>' >> /mount/www/data/index.html
+    echo '</body>' >> $PATH_EXPORT/index.html
+  )
 }
 
 copy_assets() {
+  (
   echo "copying assets to $1 ..."
   # cp /usr/local/lib/python3.11/pdb.py $1/pdb.py
+  )
+}
+
+build_one() {
+  (
+    cd "$PATH_TEMP_BUILD"
+
+    full_path="$2"
+    dirname=$(basename "$full_path")
+    echo "START build: $full_path ..."
+    destpath="$PATH_TEMP_BUILD/$1/$dirname"
+    mkdir -p $destpath
+    logpath="$PATH_TEMP_BUILD/$1/$dirname/build/web/build-log.txt"
+    versionpath="$PATH_TEMP_BUILD/$1/$dirname/build/web/build-version.txt"
+    statuspath="$PATH_TEMP_BUILD/$1/$dirname/build/web/build-status.txt"
+    mkdir -p "$(dirname "$logpath")"
+    touch "$logpath" "$versionpath" "$statuspath"
+
+    set +e
+    (
+      (
+      set -e
+      copy_assets "$destpath"
+      cp -a $full_path/* "$destpath/"
+
+      pygbag \
+      --template noctx.tmpl \
+      --app_name src \
+      --ume_block 0 \
+      --can_close 1 \
+      --package src \
+      --title src \
+      --cdn http://localhost:8000/archives/0.7/ \
+      --build \
+      $1/$dirname/main.py
+      # --directory $PATH_EXPORT \
+      # --cache /mount/cache \
+      ) 2>&1
+    ) > $logpath
+    status=$?
+    if [ $status -eq 0 ] ; then
+      echo "build OK:    $full_path"
+      date > "$versionpath"
+      echo "ok" > "$statuspath"
+    else
+      echo "build FAIL:  $full_path"
+      cat $logpath | tail -n20
+      date > "$versionpath"
+      echo "error" > "$statuspath"
+    fi
+
+    rm -rf $PATH_EXPORT/$dirname
+    mkdir -p $PATH_EXPORT/$dirname
+    mv $1/$dirname/build/web/* $PATH_EXPORT/$dirname
+  )
 }
 
 build() {
   (
-
-    for full_path in $(find /mount/$1/ -type d -maxdepth 1 -mindepth 1); do
-	dirname=$(basename "$full_path")
-	echo "building $dirname ..."
-	copy_assets "$full_path"
-	(
-	  (
-	    pygbag \
-		--template noctx.tmpl \
-		--app_name src \
-		--ume_block 0 \
-		--can_close 1 \
-		--package src \
-		--title src \
-		--cdn http://localhost:8000/archives/0.6/ \
-		--build \
-		$1/$dirname/main.py
-		# --directory /mount/www/data \
-		# --cache /mount/cache \
-
-	    rm -rf /mount/www/data/$dirname
-	    mkdir -p /mount/www/data/$dirname
-	    mv /mount/$1/$dirname/build/web/* /mount/www/data/$dirname
-	  ) || echo "\nERROR!!!\n $full_path"
-	) &
+    set +x
+    mkdir -p "$PATH_TEMP_BUILD"
+    cd "$PATH_TEMP_BUILD"
+    for full_path in $(find "/mount/$1/" -type d -maxdepth 1 -mindepth 1 | sort); do
+      (
+    build_one "$1" "$full_path"
+      ) &
     done
     wait
   )
 }
 
 start_nginx() {
+  (
   mkdir -p logs/nginx
   cp nginx.conf logs/nginx/nginx.conf
   /usr/sbin/nginx -p $PWD/logs/nginx -c nginx.conf
+  )
 }
 
 start_nginx &
@@ -64,12 +112,28 @@ build src
 make_index
 
 code_watch () {
-  while /usr/bin/inotifywait --recursive --exclude 'build/web' --exclude 'build/web-cache' -e modify ./src || sleep .1; do
-      echo "output reloading ..."
-      build src
-      make_index
-      sleep .01
+  (
+  set +x
+  while true; do
+    echo "starting autoreloader..."
+    (
+      /usr/bin/inotifywait -m --recursive --exclude 'build/web' --exclude 'build/web-cache' -e modify ./src | \
+      while read -r dir action file; do
+    (
+      src_folder=$(echo $dir | cut -d/ -f2)
+      src_fullpath=$(echo $dir | cut -d/ -f1-3)
+      src_fullpath=$(realpath "$src_fullpath")
+      if [[ -d "$src_folder" && -d "$src_fullpath" ]]; then
+        build_one "$src_folder" "$src_fullpath"
+     make_index
+      fi
+    )
+      done
+    ) || true
+    sleep 1
   done
+  )
 }
 
-code_watch
+code_watch &
+bash

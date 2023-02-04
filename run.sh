@@ -1,7 +1,7 @@
 #!/bin/bash -e
-IMG=the-ultimate-videogame-pygame-wasm:build
+IMG=gabrielv/python-browser-experiments:pygbag-wasm-0.7
 mkdir -p .cache/docker-.cache
-docker run --user "`id -u`:`id -g`" --rm -it \
+docker run --name pygame-server-experiments-wasm --user "`id -u`:`id -g`" --rm -it \
     -p 127.0.0.1:8000:8000 \
     -v "$PWD:/mount"  \
     -v "$PWD/.cache/docker-.cache:/.cache" \

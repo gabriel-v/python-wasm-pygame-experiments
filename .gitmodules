@@ -64,3 +64,9 @@
 [submodule "examples/pygame-lvgl-wasm"]
 	path = examples/pygame-lvgl-wasm
 	url = https://github.com/pmp-p/pygame-lvgl-wasm
+[submodule "lib/pygbag"]
+	path = lib/pygbag
+	url = https://github.com/gabriel-v/pygbag
+[submodule "lib/python-wasm-sdk"]
+	path = lib/python-wasm-sdk
+	url = https://github.com/pygame-web/python-wasm-sdk
