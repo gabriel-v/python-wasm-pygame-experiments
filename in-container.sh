@@ -1,14 +1,18 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 export PATH_EXPORT=/mount/www/data
-export PATH_TEMP_BUILD=/mount/build
+export PATH_TEMP_BUILD=/mount/.build
+export PATH_NGINX=/mount/.build/nginx
 
 rm -rf $PATH_EXPORT
 mkdir -p $PATH_EXPORT
+rm -rf $PATH_TEMP_BUILD
+mkdir -p $PATH_TEMP_BUILD
+rm -rf $PATH_NGINX
+mkdir -p $PATH_NGINX
 
 make_index() {
   (
-  set +x
   echo "making index..."
 
     echo '<body>' > $PATH_EXPORT/index.html
@@ -37,7 +41,9 @@ build_one() {
     dirname=$(basename "$full_path")
     echo "START build: $full_path ..."
     destpath="$PATH_TEMP_BUILD/$1/$dirname"
+    destparent="$PATH_TEMP_BUILD/$1"
     mkdir -p $destpath
+    main="$PATH_TEMP_BUILD/$1/$dirname/main.py"
     logpath="$PATH_TEMP_BUILD/$1/$dirname/build/web/build-log.txt"
     versionpath="$PATH_TEMP_BUILD/$1/$dirname/build/web/build-version.txt"
     statuspath="$PATH_TEMP_BUILD/$1/$dirname/build/web/build-status.txt"
@@ -49,7 +55,7 @@ build_one() {
       (
       set -e
       copy_assets "$destpath"
-      cp -a $full_path/* "$destpath/"
+      cp -a "$full_path" "$destparent"
 
       pygbag \
       --template noctx.tmpl \
@@ -60,7 +66,7 @@ build_one() {
       --title src \
       --cdn http://localhost:8000/archives/0.7/ \
       --build \
-      $1/$dirname/main.py
+      "$main"
       # --directory $PATH_EXPORT \
       # --cache /mount/cache \
       ) 2>&1
@@ -78,14 +84,12 @@ build_one() {
     fi
 
     rm -rf $PATH_EXPORT/$dirname
-    mkdir -p $PATH_EXPORT/$dirname
-    mv $1/$dirname/build/web/* $PATH_EXPORT/$dirname
+    mv $1/$dirname/build/web $PATH_EXPORT/$dirname
   )
 }
 
 build() {
   (
-    set +x
     mkdir -p "$PATH_TEMP_BUILD"
     cd "$PATH_TEMP_BUILD"
     for full_path in $(find "/mount/$1/" -type d -maxdepth 1 -mindepth 1 | sort); do
@@ -99,21 +103,21 @@ build() {
 
 start_nginx() {
   (
-  mkdir -p logs/nginx
-  cp nginx.conf logs/nginx/nginx.conf
-  /usr/sbin/nginx -p $PWD/logs/nginx -c nginx.conf
+  cp nginx.conf "$PATH_NGINX/nginx.conf"
+  cd $PATH_NGINX
+  /usr/sbin/nginx -p "$PATH_NGINX" -c nginx.conf
   )
 }
 
-start_nginx &
-
-build examples
-build src
-make_index
+start_code_server() {
+  (
+    echo "STARTING CODE SERVER..."
+    code-server --config code-server.yaml
+  )
+}
 
 code_watch () {
   (
-  set +x
   while true; do
     echo "starting autoreloader..."
     (
@@ -134,6 +138,13 @@ code_watch () {
   done
   )
 }
+
+start_nginx &
+start_code_server &
+
+# build examples
+build src
+make_index
 
 code_watch &
 bash

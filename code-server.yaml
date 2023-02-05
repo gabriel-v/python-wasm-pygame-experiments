@@ -1,0 +1,12 @@
+bind-addr: 0.0.0.0:8080
+auth: none
+# password: SuperStrongPassword
+cert: false
+disable-telemetry: true
+disable-update-check: true
+disable-file-downloads: true
+disable-workspace-trust: true
+disable-getting-started-override: true
+user-data-dir: "/mount/.code-server-data"
+# extensions-dir: "/mount/code-server/extensions"
+proxy-domain: "localhost"

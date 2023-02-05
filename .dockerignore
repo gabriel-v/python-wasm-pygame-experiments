@@ -1,4 +1,5 @@
-/build
+/.build
+/.code-server-data/logs
 /logs
 /www
 /src/build

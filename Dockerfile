@@ -37,3 +37,16 @@ RUN pip install -r requirements.txt
 
 RUN whereis ffmpeg
 ENV PATH="$PATH:/usr/bin"
+
+WORKDIR /vg_lib
+# RUN apt-get install -y postgresql-13
+ENV CODE_SERVER_VERSION=4.9.1
+RUN curl -fOL https://github.com/coder/code-server/releases/download/v$CODE_SERVER_VERSION/code-server_${CODE_SERVER_VERSION}_amd64.deb && dpkg -i code-server_${CODE_SERVER_VERSION}_amd64.deb
+RUN SERVICE_URL=https://open-vsx.org/vscode/gallery \
+  ITEM_URL=https://open-vsx.org/vscode/item \
+  code-server --install-extension gitduck.code-streaming && code-server --install-extension genuitecllc.codetogether
+
+RUN useradd -ms /bin/bash you
+RUN mkdir -p /mount && chown you:you /mount
+WORKDIR /mount
+USER you
