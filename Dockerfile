@@ -39,14 +39,18 @@ RUN whereis ffmpeg
 ENV PATH="$PATH:/usr/bin"
 
 WORKDIR /vg_lib
-# RUN apt-get install -y postgresql-13
+# RUN apt-get install -y 
 ENV CODE_SERVER_VERSION=4.9.1
 RUN curl -fOL https://github.com/coder/code-server/releases/download/v$CODE_SERVER_VERSION/code-server_${CODE_SERVER_VERSION}_amd64.deb && dpkg -i code-server_${CODE_SERVER_VERSION}_amd64.deb
-RUN SERVICE_URL=https://open-vsx.org/vscode/gallery \
-  ITEM_URL=https://open-vsx.org/vscode/item \
-  code-server --install-extension gitduck.code-streaming && code-server --install-extension genuitecllc.codetogether
+# ENV CODER_SERVER_VERSION=0.16.0
+# RUN curl -fOL https://github.com/coder/coder/releases/download/v$CODER_SERVER_VERSION/coder_${CODER_SERVER_VERSION}_linux_amd64.deb && dpkg -i coder_${CODER_SERVER_VERSION}_linux_amd64.deb
+# 
+
+RUN apt-get install -y shellcheck postgresql-13
 
 RUN useradd -ms /bin/bash you
 RUN mkdir -p /mount && chown you:you /mount
 WORKDIR /mount
 USER you
+ENTRYPOINT /bin/bash
+CMD ./in-container.sh

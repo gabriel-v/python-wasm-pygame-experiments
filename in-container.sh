@@ -1,9 +1,8 @@
 #!/bin/bash -e
 
-export PATH_EXPORT=/mount/www/data
-export PATH_TEMP_BUILD=/mount/.build
+export PATH_EXPORT=/mount/.build/www
+export PATH_TEMP_BUILD=/mount/.build/apps
 export PATH_NGINX=/mount/.build/nginx
-
 rm -rf $PATH_EXPORT
 mkdir -p $PATH_EXPORT
 rm -rf $PATH_TEMP_BUILD
@@ -11,12 +10,18 @@ mkdir -p $PATH_TEMP_BUILD
 rm -rf $PATH_NGINX
 mkdir -p $PATH_NGINX
 
+export CODE_EXTENSION_DIR=/mount/.build/code/server-ext
+export CODE_DATA_DIR=/mount/.build/code/server-data
+mkdir -p "$CODE_EXTENSION_DIR"
+mkdir -p "$CODE_DATA_DIR"
+
+
 make_index() {
   (
   echo "making index..."
 
     echo '<body>' > $PATH_EXPORT/index.html
-    for full_path in $(find $PATH_EXPORT/ -type d -maxdepth 1 -mindepth 1  | sort); do
+    for full_path in $(find $PATH_EXPORT/ -maxdepth 1 -mindepth 1 -type d   | sort); do
     dirname=$(basename "$full_path")
 
     echo "<a href=\"/${dirname}\">/$dirname</a>" >> $PATH_EXPORT/index.html
@@ -92,7 +97,7 @@ build() {
   (
     mkdir -p "$PATH_TEMP_BUILD"
     cd "$PATH_TEMP_BUILD"
-    for full_path in $(find "/mount/$1/" -type d -maxdepth 1 -mindepth 1 | sort); do
+    for full_path in $(find "/mount/$1/" -maxdepth 1 -mindepth 1 -type d  | sort); do
       (
     build_one "$1" "$full_path"
       ) &
@@ -112,9 +117,41 @@ start_nginx() {
 start_code_server() {
   (
     echo "STARTING CODE SERVER..."
-    code-server --config code-server.yaml
+
+    cp code-server.yaml $CODE_DATA_DIR/code-server.yaml
+    cd $CODE_DATA_DIR
+
+    # export SERVICE_URL=https://open-vsx.org/vscode/gallery
+    # export   ITEM_URL=https://open-vsx.org/vscode/item
+    # code-server \
+    #   --extensions-dir "$EXTENSION_DIR" \
+    #   --install-extension gitduck.code-streaming  \
+    #   --install-extension genuitecllc.codetogether \
+    #   --install-extension ms-python.python  \
+    #   --install-extension ms-python.black-formatter \
+    #   --install-extension mads-hartmann.bash-ide-vscode
+
+    code-server \
+      --config $CODE_DATA_DIR/code-server.yaml
+      --bind-addr=0.0.0.0:8081 \
+      --auth=none \
+      --cert=false \
+      --disable-telemetry \
+      --disable-update-check \
+      --disable-file-downloads \
+      --disable-workspace-trust \
+      --disable-getting-started-override \
+      --disable-file-downloads \
+      --disable-workspace-trust \
+      --user-data-dir="$CODE_DATA_DIR" \
+      --proxy-domain="localhost" \
+      /mount
+      # --extensions-dir "$EXTENSION_DIR" \
+      # --enable-proposed-api genuitecllc.codetogethe \
+  # ) 2>&1 > /dev/null
   )
 }
+
 
 code_watch () {
   (
@@ -129,7 +166,7 @@ code_watch () {
       src_fullpath=$(realpath "$src_fullpath")
       if [[ -d "$src_folder" && -d "$src_fullpath" ]]; then
         build_one "$src_folder" "$src_fullpath"
-     make_index
+       make_index
       fi
     )
       done
@@ -145,6 +182,27 @@ start_code_server &
 # build examples
 build src
 make_index
-
 code_watch &
 bash
+
+# start_coder_server() {
+#   (
+#     export CODER_CONFIG_DIR=/tmp/.coder
+#     export CODER_CACHE_DIRECTORY=/tmp/.coder-cache
+#     export CODER_URL="http://localhost:3000"
+#     export CODER_ACCESS_URL="http://localhost:3000"
+#     export CODER_UPDATE_CHECK='false'
+#     export CODER_TELEMETRY_ENABLE=false
+#     export CODER_TLS_ENABLE=false
+#     export CODER_DERP_SERVER_ENABLE=false
+# 
+# 
+#     mkdir -p $CODER_CONFIG_DIR
+#     mkdir -p $CODER_CACHE_DIRECTORY
+#     cd $CODER_CONFIG_DIR
+#     echo "STARTING CODER..."
+#     # coder server --access-url 'http://localhost:3000'
+#     coder server
+#   )
+# }
+# start_coder_server
