@@ -39,12 +39,10 @@ RUN whereis ffmpeg
 ENV PATH="$PATH:/usr/bin"
 
 WORKDIR /vg_lib
-# RUN apt-get install -y 
+
 ENV CODE_SERVER_VERSION=4.9.1
 RUN curl -fOL https://github.com/coder/code-server/releases/download/v$CODE_SERVER_VERSION/code-server_${CODE_SERVER_VERSION}_amd64.deb && dpkg -i code-server_${CODE_SERVER_VERSION}_amd64.deb
-# ENV CODER_SERVER_VERSION=0.16.0
-# RUN curl -fOL https://github.com/coder/coder/releases/download/v$CODER_SERVER_VERSION/coder_${CODER_SERVER_VERSION}_linux_amd64.deb && dpkg -i coder_${CODER_SERVER_VERSION}_linux_amd64.deb
-# 
+
 
 RUN apt-get install -y shellcheck postgresql-13
 

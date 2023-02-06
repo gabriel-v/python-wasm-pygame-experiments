@@ -1,1 +1,6 @@
 # pygbag
+flask
+flask-sock
+Flask-Caching
+gunicorn[gevent]
+jurigged

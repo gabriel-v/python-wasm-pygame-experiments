@@ -35,6 +35,9 @@ copy_assets() {
   (
   echo "copying assets to $1 ..."
   # cp /usr/local/lib/python3.11/pdb.py $1/pdb.py
+  cp /usr/local/lib/python3.11/pdb.py $1/hmac.py
+  # cp -a /usr/local/lib/python3.11/http $1/http
+  # cp /usr/local/lib/python3.11/asyncio/coroutines.py $1/asyncio/coroutines.py
   )
 }
 
@@ -79,7 +82,7 @@ build_one() {
     status=$?
     if [ $status -eq 0 ] ; then
       echo "build OK:    $full_path"
-      date > "$versionpath"
+      python3 -c "import time; print(time.time())" > "$versionpath"
       echo "ok" > "$statuspath"
     else
       echo "build FAIL:  $full_path"
@@ -153,6 +156,14 @@ start_code_server() {
 }
 
 
+start_api() {
+  (
+    gunicorn -b 0.0.0.0:8082 --worker-class gevent --workers 4 --threads 100 api_autoreloader:app
+  # gunicorn -b 0.0.0.0:8082 --worker-class sync api_autoreloader:app
+  )
+}
+
+
 code_watch () {
   (
   while true; do
@@ -176,6 +187,7 @@ code_watch () {
   )
 }
 
+start_api &
 start_nginx &
 start_code_server &
 
@@ -185,24 +197,3 @@ make_index
 code_watch &
 bash
 
-# start_coder_server() {
-#   (
-#     export CODER_CONFIG_DIR=/tmp/.coder
-#     export CODER_CACHE_DIRECTORY=/tmp/.coder-cache
-#     export CODER_URL="http://localhost:3000"
-#     export CODER_ACCESS_URL="http://localhost:3000"
-#     export CODER_UPDATE_CHECK='false'
-#     export CODER_TELEMETRY_ENABLE=false
-#     export CODER_TLS_ENABLE=false
-#     export CODER_DERP_SERVER_ENABLE=false
-# 
-# 
-#     mkdir -p $CODER_CONFIG_DIR
-#     mkdir -p $CODER_CACHE_DIRECTORY
-#     cd $CODER_CONFIG_DIR
-#     echo "STARTING CODER..."
-#     # coder server --access-url 'http://localhost:3000'
-#     coder server
-#   )
-# }
-# start_coder_server
