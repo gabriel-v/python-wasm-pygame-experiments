@@ -24,13 +24,16 @@ docker run --name pygame-server-experiments-wasm --rm -i     -p 127.0.0.1:8000:8
 
 ## open links
 
+- split screen in 2
 - code editor http://localhost:8000/vs-code/?folder=/mount
-- hot reload pong (change game.py) - http://localhost:8000/test-hotreload/#debug
+- hot reload pong - http://localhost:8000/test-hotreload/#debug
+- in vs-code editor, change `src/test-hotreload/game.py` and see game reset itself to new code
 
 ## how to use
 
 - copy `src/test-hotreload` into `src/your-new-thing`
-- restart container and open http://localhost:8000
+- restart container and open http://localhost:8000/your-new-thing/#debug
+- edit src/your-new-thing/game.py` in vs-code
 
 ## browser hot reload
 
